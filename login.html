@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gasket Production System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+        }
+        .logo-container {
+            width: 200px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 0 auto 32px;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+
+<div class="w-full max-w-md">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="https://inaexport.id/uploads/Profile/Eksportir/76139/1698638837_Fuboru.jpeg" 
+                 alt="Fuboru Logo" 
+                 class="max-w-full max-h-full object-contain">
+        </div>
+        
+        <!-- Title -->
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Gasket Production System</h1>
+            <p class="text-gray-500 text-sm">Silakan login untuk melanjutkan</p>
+        </div>
+        
+        <!-- Alert -->
+        <div id="alertBox" class="hidden mb-4 p-4 rounded-lg">
+            <p id="alertMessage" class="text-sm"></p>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        required
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="karu@gasket.com"
+                    >
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        required
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="••••••••"
+                    >
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between">
+                <label class="flex items-center">
+                    <input type="checkbox" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                </label>
+                <a href="#" class="text-sm text-orange-600 hover:text-orange-700 font-medium">Lupa password?</a>
+            </div>
+            
+            <button 
+                type="submit" 
+                id="loginBtn"
+                class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:shadow-lg transition duration-200"
+            >
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </button>
+        </form>
+        
+        <!-- Footer -->
+        <div class="mt-6 text-center text-xs text-gray-500">
+            <p>© 2026 Fuboru. Developed by RnD Team.</p>
+        </div>
+    </div>
+    
+    <!-- Quick Access Info -->
+    <div class="mt-6 bg-white/90 backdrop-blur rounded-lg p-4 text-center text-sm">
+        <p class="text-gray-600 mb-2"><i class="fas fa-info-circle mr-1"></i> Demo Login:</p>
+        <p class="text-gray-800 font-mono">karu@gasket.com / karu123</p>
+    </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+<script>
+// Firebase Config - GANTI DENGAN PUNYA ANDA
+const firebaseConfig = {
+  apiKey: "AIzaSyAFfr8FObeGAF7LXFsQobP_sR-S7p_tGoY",
+  authDomain: "iot-production-monitor.firebaseapp.com",
+  databaseURL: "https://iot-production-monitor-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "iot-production-monitor",
+  storageBucket: "iot-production-monitor.firebasestorage.app",
+  messagingSenderId: "934517564102",
+  appId: "1:934517564102:web:b652142ce70fc3bf96edc7",
+  measurementId: "G-NQXGJ3X313"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// Show Alert
+function showAlert(message, type = 'error') {
+  const alertBox = document.getElementById('alertBox');
+  const alertMessage = document.getElementById('alertMessage');
+  
+  alertBox.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
+  
+  if (type === 'error') {
+    alertBox.classList.add('bg-red-50', 'text-red-700');
+  } else {
+    alertBox.classList.add('bg-green-50', 'text-green-700');
+  }
+  
+  alertMessage.textContent = message;
+  
+  setTimeout(() => {
+    alertBox.classList.add('hidden');
+  }, 5000);
+}
+
+// Login Form Handler
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const loginBtn = document.getElementById('loginBtn');
+  
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+  
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    showAlert('Login berhasil! Redirecting...', 'success');
+    
+    setTimeout(() => {
+      window.location.href = 'karu-dashboard.html';
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Login error:', error);
+    
+    let errorMessage = 'Login gagal. Silakan coba lagi.';
+    
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'Email tidak terdaftar.';
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage = 'Password salah.';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Format email tidak valid.';
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMessage = 'Terlalu banyak percobaan. Silakan coba lagi nanti.';
+    }
+    
+    showAlert(errorMessage, 'error');
+    
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>Login';
+  }
+});
+
+// Check if already logged in
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    window.location.href = 'karu-dashboard.html';
+  }
+});
+</script>
+
+</body>
+</html>
